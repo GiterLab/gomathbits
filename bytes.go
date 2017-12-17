@@ -1,7 +1,10 @@
 package gomathbits
 
-import "errors"
-import "encoding/hex"
+import (
+	"encoding/binary"
+	"encoding/hex"
+	"errors"
+)
 
 // BytesToUint8 return uint8 from bits
 func BytesToUint8(bits []byte) (u uint8, err error) {
@@ -23,15 +26,14 @@ func BytesToUint16(bits []byte) (u uint16, err error) {
 	if len(bits) != 2 {
 		return 0, errors.New("invalid syntax")
 	}
-	u = (uint16)(bits[1])<<8 | uint16(bits[0])
+	u = binary.LittleEndian.Uint16(bits)
 	return u, nil
 }
 
 // Uint16ToBytes returns bytes
 func Uint16ToBytes(u uint16) []byte {
 	b := make([]byte, 2)
-	b[0] = byte(u & 0xFF)
-	b[1] = byte((u >> 8) & 0xFF)
+	binary.LittleEndian.PutUint16(b, u)
 	return b
 }
 
@@ -40,18 +42,14 @@ func BytesToUint32(bits []byte) (u uint32, err error) {
 	if len(bits) != 4 {
 		return 0, errors.New("invalid syntax")
 	}
-	u = (uint32)(bits[3])<<24 | (uint32)(bits[2])<<16 |
-		(uint32)(bits[1])<<8 | uint32(bits[0])
+	u = binary.LittleEndian.Uint32(bits)
 	return u, nil
 }
 
 // Uint32ToBytes returns bytes
 func Uint32ToBytes(u uint32) []byte {
 	b := make([]byte, 4)
-	b[0] = byte(u & 0xFF)
-	b[1] = byte((u >> 8) & 0xFF)
-	b[2] = byte((u >> 16) & 0xFF)
-	b[3] = byte((u >> 24) & 0xFF)
+	binary.LittleEndian.PutUint32(b, u)
 	return b
 }
 
@@ -60,30 +58,20 @@ func BytesToUint64(bits []byte) (u uint64, err error) {
 	if len(bits) != 8 {
 		return 0, errors.New("invalid syntax")
 	}
-	u = (uint64)(bits[7])<<56 | (uint64)(bits[6])<<48 |
-		(uint64)(bits[5])<<40 | (uint64)(bits[4])<<32 |
-		(uint64)(bits[3])<<24 | (uint64)(bits[2])<<16 |
-		(uint64)(bits[1])<<8 | uint64(bits[0])
+	u = binary.LittleEndian.Uint64(bits)
 	return u, nil
 }
 
 // Uint64ToBytes returns bytes
 func Uint64ToBytes(u uint64) []byte {
 	b := make([]byte, 8)
-	b[0] = byte(u & 0xFF)
-	b[1] = byte((u >> 8) & 0xFF)
-	b[2] = byte((u >> 16) & 0xFF)
-	b[3] = byte((u >> 24) & 0xFF)
-	b[4] = byte((u >> 32) & 0xFF)
-	b[5] = byte((u >> 40) & 0xFF)
-	b[6] = byte((u >> 48) & 0xFF)
-	b[7] = byte((u >> 56) & 0xFF)
+	binary.LittleEndian.PutUint64(b, u)
 	return b
 }
 
-// EncodeToString returns the hexadecimal encoding of src.
-func EncodeToString(src []byte) string {
-	return hex.EncodeToString(src)
+// EncodeToString returns the hexadecimal encoding of b.
+func EncodeToString(b []byte) string {
+	return hex.EncodeToString(bytesSwap(b))
 }
 
 // ParseUInt parse hexadecimal encoding of string to uint64
@@ -95,7 +83,7 @@ func ParseUInt(s string, bitSize int) (u uint64, err error) {
 	if err != nil {
 		return 0, err
 	}
-
+	bytesSwap(bits)
 	switch bitSize {
 	case 8:
 		uu, err := BytesToUint8(bits)
@@ -134,7 +122,7 @@ func ParseInt(s string, bitSize int) (i int64, err error) {
 	if err != nil {
 		return 0, err
 	}
-
+	bytesSwap(bits)
 	switch bitSize {
 	case 8:
 		uu, err := BytesToUint8(bits)
@@ -177,7 +165,7 @@ func ParseFloat(s string, bitSize int) (f float64, err error) {
 	if err != nil {
 		return 0, err
 	}
-
+	bytesSwap(bits)
 	switch bitSize {
 	case 32:
 		uu, err := BytesToUint32(bits)
@@ -202,7 +190,7 @@ func ParseFloat32(s string) (f float32, err error) {
 	if err != nil {
 		return 0, err
 	}
-
+	bytesSwap(bits)
 	uu, err := BytesToUint32(bits)
 	if err != nil {
 		return 0, err
@@ -217,10 +205,17 @@ func ParseFloat64(s string) (f float64, err error) {
 	if err != nil {
 		return 0, err
 	}
-
+	bytesSwap(bits)
 	uu, err := BytesToUint64(bits)
 	if err != nil {
 		return 0, err
 	}
 	return Float64frombits(uu), nil
+}
+
+func bytesSwap(b []byte) []byte {
+	for from, to := 0, len(b)-1; from < to; from, to = from+1, to-1 {
+		b[from], b[to] = b[to], b[from]
+	}
+	return b
 }
