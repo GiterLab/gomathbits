@@ -8,7 +8,7 @@ import (
 
 // BytesToUint8 return uint8 from bits
 func BytesToUint8(bits []byte) (u uint8, err error) {
-	if len(bits) != 1 {
+	if len(bits) < 1 {
 		return 0, errors.New("invalid syntax")
 	}
 	return bits[0], nil
@@ -23,7 +23,7 @@ func Uint8ToBytes(u uint8) []byte {
 
 // BytesToUint16 return uint16 from bits
 func BytesToUint16(bits []byte) (u uint16, err error) {
-	if len(bits) != 2 {
+	if len(bits) < 2 {
 		return 0, errors.New("invalid syntax")
 	}
 	u = binary.LittleEndian.Uint16(bits)
@@ -39,7 +39,7 @@ func Uint16ToBytes(u uint16) []byte {
 
 // BytesToUint32 return uint32 from bits
 func BytesToUint32(bits []byte) (u uint32, err error) {
-	if len(bits) != 4 {
+	if len(bits) < 4 {
 		return 0, errors.New("invalid syntax")
 	}
 	u = binary.LittleEndian.Uint32(bits)
@@ -55,7 +55,7 @@ func Uint32ToBytes(u uint32) []byte {
 
 // BytesToUint64 return uint64 from bits
 func BytesToUint64(bits []byte) (u uint64, err error) {
-	if len(bits) != 8 {
+	if len(bits) < 8 {
 		return 0, errors.New("invalid syntax")
 	}
 	u = binary.LittleEndian.Uint64(bits)
