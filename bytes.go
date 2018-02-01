@@ -4,14 +4,15 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
+	"bytes"
 )
 
 // BytesToUint8 return uint8 from bits
-func BytesToUint8(bits []byte) (u uint8, err error) {
-	if len(bits) != 1 {
-		return 0, errors.New("invalid syntax")
+func BytesToUint8(bits []byte) (u uint8) {
+	if len(bits) < 1 {
+		return 0
 	}
-	return bits[0], nil
+	return bits[0]
 }
 
 // Uint8ToBytes returns bytes
@@ -22,12 +23,11 @@ func Uint8ToBytes(u uint8) []byte {
 }
 
 // BytesToUint16 return uint16 from bits
-func BytesToUint16(bits []byte) (u uint16, err error) {
-	if len(bits) != 2 {
-		return 0, errors.New("invalid syntax")
+func BytesToUint16(bits []byte) (u uint16) {
+	if len(bits) < 2 {
+		return binary.LittleEndian.Uint16(BytesCombine(bits,[]byte{0,0}))
 	}
-	u = binary.LittleEndian.Uint16(bits)
-	return u, nil
+	return binary.LittleEndian.Uint16(bits)
 }
 
 // Uint16ToBytes returns bytes
@@ -38,12 +38,11 @@ func Uint16ToBytes(u uint16) []byte {
 }
 
 // BytesToUint32 return uint32 from bits
-func BytesToUint32(bits []byte) (u uint32, err error) {
-	if len(bits) != 4 {
-		return 0, errors.New("invalid syntax")
+func BytesToUint32(bits []byte) (u uint32) {
+	if len(bits) < 4 {
+		return binary.LittleEndian.Uint32(BytesCombine(bits,[]byte{0,0,0,0}))
 	}
-	u = binary.LittleEndian.Uint32(bits)
-	return u, nil
+	return binary.LittleEndian.Uint32(bits)
 }
 
 // Uint32ToBytes returns bytes
@@ -54,12 +53,11 @@ func Uint32ToBytes(u uint32) []byte {
 }
 
 // BytesToUint64 return uint64 from bits
-func BytesToUint64(bits []byte) (u uint64, err error) {
-	if len(bits) != 8 {
-		return 0, errors.New("invalid syntax")
+func BytesToUint64(bits []byte) (u uint64) {
+	if len(bits) < 8 {
+		return binary.LittleEndian.Uint64(BytesCombine(bits,[]byte{0,0,0,0,0,0,0,0}))
 	}
-	u = binary.LittleEndian.Uint64(bits)
-	return u, nil
+	return binary.LittleEndian.Uint64(bits)
 }
 
 // Uint64ToBytes returns bytes
@@ -86,28 +84,16 @@ func ParseUInt(s string, bitSize int) (u uint64, err error) {
 	bytesSwap(bits)
 	switch bitSize {
 	case 8:
-		uu, err := BytesToUint8(bits)
-		if err != nil {
-			return 0, err
-		}
+		uu := BytesToUint8(bits)
 		return uint64(uu), nil
 	case 16:
-		uu, err := BytesToUint16(bits)
-		if err != nil {
-			return 0, err
-		}
+		uu := BytesToUint16(bits)
 		return uint64(uu), nil
 	case 32:
-		uu, err := BytesToUint32(bits)
-		if err != nil {
-			return 0, err
-		}
+		uu := BytesToUint32(bits)
 		return uint64(uu), nil
 	case 64:
-		uu, err := BytesToUint64(bits)
-		if err != nil {
-			return 0, err
-		}
+		uu := BytesToUint64(bits)
 		return uint64(uu), nil
 	}
 	return 0, errors.New("invalid syntax")
@@ -125,28 +111,16 @@ func ParseInt(s string, bitSize int) (i int64, err error) {
 	bytesSwap(bits)
 	switch bitSize {
 	case 8:
-		uu, err := BytesToUint8(bits)
-		if err != nil {
-			return 0, err
-		}
+		uu := BytesToUint8(bits)
 		return int64(Int8frombits(uu)), nil
 	case 16:
-		uu, err := BytesToUint16(bits)
-		if err != nil {
-			return 0, err
-		}
+		uu := BytesToUint16(bits)
 		return int64(Int16frombits(uu)), nil
 	case 32:
-		uu, err := BytesToUint32(bits)
-		if err != nil {
-			return 0, err
-		}
+		uu := BytesToUint32(bits)
 		return int64(Int32frombits(uu)), nil
 	case 64:
-		uu, err := BytesToUint64(bits)
-		if err != nil {
-			return 0, err
-		}
+		uu := BytesToUint64(bits)
 		return Int64frombits(uu), nil
 	}
 	return 0, errors.New("invalid syntax")
@@ -168,16 +142,10 @@ func ParseFloat(s string, bitSize int) (f float64, err error) {
 	bytesSwap(bits)
 	switch bitSize {
 	case 32:
-		uu, err := BytesToUint32(bits)
-		if err != nil {
-			return 0, err
-		}
+		uu := BytesToUint32(bits)
 		return float64(Float32frombits(uu)), nil
 	case 64:
-		uu, err := BytesToUint64(bits)
-		if err != nil {
-			return 0, err
-		}
+		uu := BytesToUint64(bits)
 		return Float64frombits(uu), nil
 	}
 	return 0, errors.New("invalid syntax")
@@ -191,10 +159,7 @@ func ParseFloat32(s string) (f float32, err error) {
 		return 0, err
 	}
 	bytesSwap(bits)
-	uu, err := BytesToUint32(bits)
-	if err != nil {
-		return 0, err
-	}
+	uu := BytesToUint32(bits)
 	return Float32frombits(uu), nil
 }
 
@@ -206,10 +171,7 @@ func ParseFloat64(s string) (f float64, err error) {
 		return 0, err
 	}
 	bytesSwap(bits)
-	uu, err := BytesToUint64(bits)
-	if err != nil {
-		return 0, err
-	}
+	uu := BytesToUint64(bits)
 	return Float64frombits(uu), nil
 }
 
@@ -218,4 +180,15 @@ func bytesSwap(b []byte) []byte {
 		b[from], b[to] = b[to], b[from]
 	}
 	return b
+}
+
+// BytesCombine 组合数据包
+func BytesCombine(pBytes ...[]byte) []byte {
+	lenth := len(pBytes)
+	s := make([][]byte, lenth)
+	for i, v := range pBytes {
+		s[i] = v
+	}
+	sep := []byte("")
+	return bytes.Join(s, sep)
 }
