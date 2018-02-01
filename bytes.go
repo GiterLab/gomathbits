@@ -1,6 +1,7 @@
 package gomathbits
 
 import (
+	"bytes"
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
@@ -8,7 +9,7 @@ import (
 
 // BytesToUint8 return uint8 from bits
 func BytesToUint8(bits []byte) (u uint8, err error) {
-	if len(bits) != 1 {
+	if len(bits) < 1 {
 		return 0, errors.New("invalid syntax")
 	}
 	return bits[0], nil
@@ -23,11 +24,10 @@ func Uint8ToBytes(u uint8) []byte {
 
 // BytesToUint16 return uint16 from bits
 func BytesToUint16(bits []byte) (u uint16, err error) {
-	if len(bits) != 2 {
+	if len(bits) < 2 {
 		return 0, errors.New("invalid syntax")
 	}
-	u = binary.LittleEndian.Uint16(bits)
-	return u, nil
+	return binary.LittleEndian.Uint16(bits), nil
 }
 
 // Uint16ToBytes returns bytes
@@ -39,11 +39,10 @@ func Uint16ToBytes(u uint16) []byte {
 
 // BytesToUint32 return uint32 from bits
 func BytesToUint32(bits []byte) (u uint32, err error) {
-	if len(bits) != 4 {
+	if len(bits) < 4 {
 		return 0, errors.New("invalid syntax")
 	}
-	u = binary.LittleEndian.Uint32(bits)
-	return u, nil
+	return binary.LittleEndian.Uint32(bits), nil
 }
 
 // Uint32ToBytes returns bytes
@@ -55,11 +54,10 @@ func Uint32ToBytes(u uint32) []byte {
 
 // BytesToUint64 return uint64 from bits
 func BytesToUint64(bits []byte) (u uint64, err error) {
-	if len(bits) != 8 {
+	if len(bits) < 8 {
 		return 0, errors.New("invalid syntax")
 	}
-	u = binary.LittleEndian.Uint64(bits)
-	return u, nil
+	return binary.LittleEndian.Uint64(bits), nil
 }
 
 // Uint64ToBytes returns bytes
@@ -218,4 +216,15 @@ func bytesSwap(b []byte) []byte {
 		b[from], b[to] = b[to], b[from]
 	}
 	return b
+}
+
+// BytesCombine combine the byte array
+func BytesCombine(pBytes ...[]byte) []byte {
+	lenth := len(pBytes)
+	s := make([][]byte, lenth)
+	for i, v := range pBytes {
+		s[i] = v
+	}
+	sep := []byte("")
+	return bytes.Join(s, sep)
 }
