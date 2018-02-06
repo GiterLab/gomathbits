@@ -228,3 +228,13 @@ func BytesCombine(pBytes ...[]byte) []byte {
 	sep := []byte("")
 	return bytes.Join(s, sep)
 }
+
+// ByteString byte to string except 0
+func ByteString(p []byte) string {
+	for i := 0; i < len(p); i++ {
+		if p[i] == 0 {
+			return string(p[0:i])
+		}
+	}
+	return string(p)
+}
