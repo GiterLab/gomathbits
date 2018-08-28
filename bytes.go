@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
+	"unsafe"
 )
 
 // BytesToUint8 return uint8 from bits
@@ -227,4 +228,28 @@ func BytesCombine(pBytes ...[]byte) []byte {
 	}
 	sep := []byte("")
 	return bytes.Join(s, sep)
+}
+
+// ByteString byte to string except 0
+func ByteString(p []byte) string {
+	for i := 0; i < len(p); i++ {
+		if p[i] == 0 {
+			return string(p[0:i])
+		}
+	}
+	return string(p)
+}
+
+// String2bytes String to bytes
+func String2bytes(s string) []byte {
+	x := (*[2]uintptr)(unsafe.Pointer(&s))
+	h := [3]uintptr{x[0], x[1], x[1]}
+	return *(*[]byte)(unsafe.Pointer(&h))
+}
+
+// Bytes2string Bytes to string
+func Bytes2string(b []byte) string {
+	h := (*[3]uintptr)(unsafe.Pointer(&b))
+	x := [2]uintptr{h[0], h[1]}
+	return *(*string)(unsafe.Pointer(&x))
 }
