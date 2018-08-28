@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
+	"unsafe"
 )
 
 // BytesToUint8 return uint8 from bits
@@ -237,4 +238,16 @@ func ByteString(p []byte) string {
 		}
 	}
 	return string(p)
+}
+
+func Str2byte(s string) []byte {
+	x := (*[2]uintptr)(unsafe.Pointer(&s))
+	h := [3]uintptr{x[0], x[1], x[1]}
+	return *(*[]byte)(unsafe.Pointer(&h))
+}
+
+func Byte2str(b []byte) string {
+	h := (*[3]uintptr)(unsafe.Pointer(&b))
+	x := [2]uintptr{h[0], h[1]}
+	return *(*string)(unsafe.Pointer(&x))
 }
